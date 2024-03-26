@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-type Vector [3]float32
+type Vector []float32
 
 type KDTreeNode interface {
 	isKDTreeNode()
@@ -100,10 +100,10 @@ func euclideanDistance(p1, p2 Vector) float32 {
 }
 
 func main() {
-	points := []Vector{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}, {2.0, 3.0, 4.0}} // Add more points here
+	points := []Vector{{1.0, 2.0, 3.0, 5.0}, {4.0, 5.0, 6.0, 2.0}, {2.0, 3.0, 4.0, 1.5}, {1.0, 5.0, 3.0, 2.3}} // Add more points here
 	kdTree := KDTree{Root: build(points, 0)}
 
-	if nearest := kdTree.nearestNeighbor(Vector{1.0, 5.0, 3.0}); nearest != nil {
+	if nearest := kdTree.nearestNeighbor(Vector{1.0, 5.0, 3.0, 2.3}); nearest != nil {
 		fmt.Println("Nearest neighbor:", *nearest)
 	}
 }
