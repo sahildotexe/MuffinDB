@@ -3,57 +3,107 @@ package main
 import (
 	"fmt"
 	"math"
+	"sort"
 )
 
-type Vector [3]float64
+type Vector [3]float32
 
-type VectorDB struct {
-	vectors []Vector
+type KDTreeNode interface {
+	isKDTreeNode()
 }
 
-func NewVectorDB() *VectorDB {
-	return &VectorDB{}
+type Leaf struct {
+	Point Vector
 }
 
-func (db *VectorDB) AddVector(v Vector) {
-	db.vectors = append(db.vectors, v)
+type Internal struct {
+	Left           KDTreeNode
+	Right          KDTreeNode
+	SplitValue     float32
+	SplitDimension int
 }
 
-func (db *VectorDB) GetVector(i int) Vector {
-	return db.vectors[i]
+func (_ Leaf) isKDTreeNode() {}
+
+func (_ Internal) isKDTreeNode() {}
+
+type KDTree struct {
+	Root KDTreeNode
 }
 
-func (db *VectorDB) FindClosest(v Vector) Vector {
-	if len(db.vectors) == 0 {
-		return Vector{}
+func build(points []Vector, depth int) KDTreeNode {
+	if len(points) == 1 {
+		return Leaf{points[0]}
 	}
 
-	closest := db.vectors[0]
-	closestDist := euclideanDistance(v, closest)
-	for _, vector := range db.vectors {
-		dist := euclideanDistance(v, vector)
-		if dist < closestDist {
-			closest = vector
-			closestDist = dist
+	dim := depth % len(points[0]) // Assuming all points have the same dimension
+	sortedPoints := make([]Vector, len(points))
+	copy(sortedPoints, points)
+	sortByDimension(sortedPoints, dim)
+
+	medianIdx := len(sortedPoints) / 2
+	medianValue := sortedPoints[medianIdx][dim]
+
+	return Internal{
+		Left:           build(sortedPoints[:medianIdx], depth+1),
+		Right:          build(sortedPoints[medianIdx:], depth+1),
+		SplitValue:     medianValue,
+		SplitDimension: dim,
+	}
+}
+
+func sortByDimension(points []Vector, dim int) {
+	sort.Slice(points, func(i, j int) bool {
+		return points[i][dim] < points[j][dim]
+	})
+}
+
+func (kdtree KDTree) nearestNeighbor(query Vector) *Vector {
+	_, nearest := kdtree.nearest(query, kdtree.Root, nil, math.MaxFloat32)
+	return nearest
+}
+
+func (kdtree KDTree) nearest(query Vector, node KDTreeNode, best *Vector, bestDist float32) (float32, *Vector) {
+	switch n := node.(type) {
+	case Leaf:
+		dist := euclideanDistance(query, n.Point)
+		if dist < bestDist {
+			return dist, &n.Point
 		}
+		return bestDist, best
+	case Internal:
+		var nextNode KDTreeNode
+		var otherNode KDTreeNode
+		if query[n.SplitDimension] < n.SplitValue {
+			nextNode = n.Left
+			otherNode = n.Right
+		} else {
+			nextNode = n.Right
+			otherNode = n.Left
+		}
+		updatedBestDist, updatedBest := kdtree.nearest(query, nextNode, best, bestDist)
+		if math.Abs(float64(query[n.SplitDimension]-n.SplitValue)) < float64(updatedBestDist) {
+			return kdtree.nearest(query, otherNode, updatedBest, updatedBestDist)
+		}
+		return updatedBestDist, updatedBest
+	default:
+		panic("unexpected node type")
 	}
-	return closest
 }
 
-func euclideanDistance(v1, v2 Vector) float64 {
-	return math.Sqrt((v1[0]-v2[0])*(v1[0]-v2[0]) + (v1[1]-v2[1])*(v1[1]-v2[1]) + (v1[2]-v2[2])*(v1[2]-v2[2]))
+func euclideanDistance(p1, p2 Vector) float32 {
+	var sum float32
+	for i := 0; i < len(p1); i++ {
+		sum += (p1[i] - p2[i]) * (p1[i] - p2[i])
+	}
+	return float32(math.Sqrt(float64(sum)))
 }
 
 func main() {
-	db := NewVectorDB()
-	db.AddVector(Vector{1, 2, 3})
-	db.AddVector(Vector{4, 5, 6})
+	points := []Vector{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}, {2.0, 3.0, 4.0}} // Add more points here
+	kdTree := KDTree{Root: build(points, 0)}
 
-	// get vector by index.
-	v2 := db.GetVector(1)
-	fmt.Println(v2)
-
-	v := Vector{2.0, 5.0, 6.0}
-	closest := db.FindClosest(v)
-	fmt.Println(closest)
+	if nearest := kdTree.nearestNeighbor(Vector{1.0, 5.0, 3.0}); nearest != nil {
+		fmt.Println("Nearest neighbor:", *nearest)
+	}
 }
