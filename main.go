@@ -129,8 +129,9 @@ func min(a, b int) int {
 func main() {
 	points := []Vector{{1.0, 2.0, 3.0, 5.0}, {4.0, 5.0, 6.0, 2.0}, {2.0, 3.0, 4.0, 1.5}, {1.0, 5.0, 3.0, 2.3}}
 	kdTree := KDTree{Root: build(points, 0)}
-	neighbors := kdTree.nearestNeighbor(Vector{2, 3, 4, 1}, 4)
-	for _, neighbor := range neighbors {
-		fmt.Printf("Point: %v, Distance: %.2f\n", neighbor.Point, neighbor.distance)
+	neighbors := kdTree.nearestNeighbor(Vector{2, 3, 4, 1.5}, len(points))
+	k := 1
+	for i := 0; i < k; i++ {
+		fmt.Println("Point:", neighbors[i].Point, "Distance:", neighbors[i].distance)
 	}
 }
