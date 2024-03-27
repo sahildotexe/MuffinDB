@@ -6,7 +6,10 @@ import (
 	"sort"
 )
 
-type Vector []float32
+type Vector struct {
+	ID     int       // Unique identifier for the vector
+	Values []float32 // Values of the vector
+}
 
 type KDTreeNode interface {
 	isKDTreeNode()
@@ -34,12 +37,12 @@ func build(points []Vector, depth int) KDTreeNode {
 	if len(points) == 1 {
 		return Leaf{points[0]}
 	}
-	dim := depth % len(points[0]) // Assuming all points have the same dimension
+	dim := depth % len(points[0].Values) // Assuming all points have the same dimension
 	sortedPoints := make([]Vector, len(points))
 	copy(sortedPoints, points)
 	sortByDimension(sortedPoints, dim)
 	medianIdx := len(sortedPoints) / 2
-	medianValue := sortedPoints[medianIdx][dim]
+	medianValue := sortedPoints[medianIdx].Values[dim]
 	return Internal{
 		Left:           build(sortedPoints[:medianIdx], depth+1),
 		Right:          build(sortedPoints[medianIdx:], depth+1),
@@ -50,7 +53,7 @@ func build(points []Vector, depth int) KDTreeNode {
 
 func sortByDimension(points []Vector, dim int) {
 	sort.Slice(points, func(i, j int) bool {
-		return points[i][dim] < points[j][dim]
+		return points[i].Values[dim] < points[j].Values[dim]
 	})
 }
 
@@ -74,7 +77,7 @@ func (kdtree KDTree) nearest(query Vector, node KDTreeNode, neighbors []HeapVect
 	case Internal:
 		var nextNode KDTreeNode
 		var otherNode KDTreeNode
-		if query[n.SplitDimension] < n.SplitValue {
+		if query.Values[n.SplitDimension] < n.SplitValue {
 			nextNode = n.Left
 			otherNode = n.Right
 		} else {
@@ -82,7 +85,7 @@ func (kdtree KDTree) nearest(query Vector, node KDTreeNode, neighbors []HeapVect
 			otherNode = n.Left
 		}
 		neighbors, bestDist = kdtree.nearest(query, nextNode, neighbors, bestDist, k)
-		if math.Abs(float64(query[n.SplitDimension]-n.SplitValue)) < float64(bestDist) {
+		if math.Abs(float64(query.Values[n.SplitDimension]-n.SplitValue)) < float64(bestDist) {
 			neighbors, bestDist = kdtree.nearest(query, otherNode, neighbors, bestDist, k)
 		}
 		return neighbors, bestDist
@@ -93,8 +96,8 @@ func (kdtree KDTree) nearest(query Vector, node KDTreeNode, neighbors []HeapVect
 
 func euclideanDistance(p1, p2 Vector) float32 {
 	var sum float32
-	for i := 0; i < len(p1); i++ {
-		sum += (p1[i] - p2[i]) * (p1[i] - p2[i])
+	for i := 0; i < len(p1.Values); i++ {
+		sum += (p1.Values[i] - p2.Values[i]) * (p1.Values[i] - p2.Values[i])
 	}
 	return float32(math.Sqrt(float64(sum)))
 }
@@ -127,11 +130,17 @@ func min(a, b int) int {
 }
 
 func main() {
-	points := []Vector{{1.0, 2.0, 3.0, 5.0}, {4.0, 5.0, 6.0, 2.0}, {2.0, 3.0, 4.0, 1.5}, {1.0, 5.0, 3.0, 2.3}}
+	points := []Vector{
+		{ID: 1, Values: []float32{1.0, 2.0, 3.0, 5.0}},
+		{ID: 2, Values: []float32{4.0, 5.0, 6.0, 2.0}},
+		{ID: 3, Values: []float32{2.0, 3.0, 4.0, 1.5}},
+		{ID: 4, Values: []float32{1.0, 5.0, 3.0, 2.3}},
+	}
 	kdTree := KDTree{Root: build(points, 0)}
-	neighbors := kdTree.nearestNeighbor(Vector{2, 3, 4, 1.5}, len(points))
-	k := 1
+	queryPoint := Vector{Values: []float32{2, 3, 4, 1.5}} // Adding an ID for the query point
+	neighbors := kdTree.nearestNeighbor(queryPoint, len(points))
+	k := 4
 	for i := 0; i < k; i++ {
-		fmt.Println("Point:", neighbors[i].Point, "Distance:", neighbors[i].distance)
+		fmt.Println("Point ID:", neighbors[i].Point.ID, "Point Values:", neighbors[i].Point.Values, "Distance:", neighbors[i].distance)
 	}
 }
