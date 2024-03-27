@@ -1,3 +1,3 @@
-module github.com/sahildotexe/go-vector-db
+module GoVectorDB
 
 go 1.20
