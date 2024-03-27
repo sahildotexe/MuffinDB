@@ -1,13 +1,14 @@
 package kdtree
 
 import (
+	"fmt"
 	"math"
 	"sort"
 )
 
 type Vector struct {
-	ID     int       // Unique identifier for the vector
-	Values []float32 // Values of the vector
+	ID     int
+	Values []float32
 }
 
 type KDTreeNode interface {
@@ -48,6 +49,40 @@ func BuildTree(points []Vector, depth int) KDTreeNode {
 		SplitValue:     medianValue,
 		SplitDimension: dim,
 	}
+}
+
+
+func (kdtree KDTree) PrintTree() {
+	printTree(kdtree.Root, 0)
+}
+
+func printTree(node KDTreeNode, depth int) {
+	switch n := node.(type) {
+	case Leaf:
+		printSpaces(depth)
+		printVector(n.Point)
+	case Internal:
+		printSpaces(depth)
+		printInternal(n)
+		printTree(n.Left, depth+1)
+		printTree(n.Right, depth+1)
+	default:
+		panic("unexpected node type")
+	}
+}
+
+func printSpaces(depth int) {
+	for i := 0; i < depth; i++ {
+		fmt.Print("  ")
+	}
+}
+
+func printInternal(node Internal) {
+	fmt.Printf("Split Dimension: %d, Split Value: %.02f\n", node.SplitDimension, node.SplitValue)
+}
+
+func printVector(v Vector) {
+	fmt.Printf("ID: %d, Point: %v\n", v.ID, v.Values)
 }
 
 func sortByDimension(points []Vector, dim int) {
@@ -117,7 +152,7 @@ func pushHeap(neighbors []HeapVector, point Vector, dist float32, k int) []HeapV
 	copy(heap, neighbors)
 	heap = heap[:min(len(heap)+1, k)]
 	heap[len(heap)-1] = HeapVector{Point: point, Distance: dist}
-	sort.Sort(heap) // Using sort.Sort instead of heap.Sort()
+	sort.Sort(heap)
 	return heap
 }
 
