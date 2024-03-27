@@ -23,8 +23,7 @@ type Internal struct {
 	SplitDimension int
 }
 
-func (_ Leaf) isKDTreeNode() {}
-
+func (_ Leaf) isKDTreeNode()     {}
 func (_ Internal) isKDTreeNode() {}
 
 type KDTree struct {
@@ -35,15 +34,12 @@ func build(points []Vector, depth int) KDTreeNode {
 	if len(points) == 1 {
 		return Leaf{points[0]}
 	}
-
 	dim := depth % len(points[0]) // Assuming all points have the same dimension
 	sortedPoints := make([]Vector, len(points))
 	copy(sortedPoints, points)
 	sortByDimension(sortedPoints, dim)
-
 	medianIdx := len(sortedPoints) / 2
 	medianValue := sortedPoints[medianIdx][dim]
-
 	return Internal{
 		Left:           build(sortedPoints[:medianIdx], depth+1),
 		Right:          build(sortedPoints[medianIdx:], depth+1),
@@ -58,19 +54,23 @@ func sortByDimension(points []Vector, dim int) {
 	})
 }
 
-func (kdtree KDTree) nearestNeighbor(query Vector) *Vector {
-	_, nearest := kdtree.nearest(query, kdtree.Root, nil, math.MaxFloat32)
-	return nearest
+func (kdtree KDTree) nearestNeighbor(query Vector, k int) []HeapVector {
+	if k <= 0 {
+		return nil
+	}
+	neighbors, _ := kdtree.nearest(query, kdtree.Root, make([]HeapVector, 0, k), math.MaxFloat32, k)
+	return neighbors
 }
 
-func (kdtree KDTree) nearest(query Vector, node KDTreeNode, best *Vector, bestDist float32) (float32, *Vector) {
+func (kdtree KDTree) nearest(query Vector, node KDTreeNode, neighbors []HeapVector, bestDist float32, k int) ([]HeapVector, float32) {
 	switch n := node.(type) {
 	case Leaf:
 		dist := euclideanDistance(query, n.Point)
-		if dist < bestDist {
-			return dist, &n.Point
+		neighbors = pushHeap(neighbors, n.Point, dist, k)
+		if len(neighbors) == k {
+			bestDist = neighbors[0].distance
 		}
-		return bestDist, best
+		return neighbors, bestDist
 	case Internal:
 		var nextNode KDTreeNode
 		var otherNode KDTreeNode
@@ -81,11 +81,11 @@ func (kdtree KDTree) nearest(query Vector, node KDTreeNode, best *Vector, bestDi
 			nextNode = n.Right
 			otherNode = n.Left
 		}
-		updatedBestDist, updatedBest := kdtree.nearest(query, nextNode, best, bestDist)
-		if math.Abs(float64(query[n.SplitDimension]-n.SplitValue)) < float64(updatedBestDist) {
-			return kdtree.nearest(query, otherNode, updatedBest, updatedBestDist)
+		neighbors, bestDist = kdtree.nearest(query, nextNode, neighbors, bestDist, k)
+		if math.Abs(float64(query[n.SplitDimension]-n.SplitValue)) < float64(bestDist) {
+			neighbors, bestDist = kdtree.nearest(query, otherNode, neighbors, bestDist, k)
 		}
-		return updatedBestDist, updatedBest
+		return neighbors, bestDist
 	default:
 		panic("unexpected node type")
 	}
@@ -99,11 +99,38 @@ func euclideanDistance(p1, p2 Vector) float32 {
 	return float32(math.Sqrt(float64(sum)))
 }
 
-func main() {
-	points := []Vector{{1.0, 2.0, 3.0, 5.0}, {4.0, 5.0, 6.0, 2.0}, {2.0, 3.0, 4.0, 1.5}, {1.0, 5.0, 3.0, 2.3}} // Add more points here
-	kdTree := KDTree{Root: build(points, 0)}
+type HeapVector struct {
+	Point    Vector
+	distance float32
+}
 
-	if nearest := kdTree.nearestNeighbor(Vector{1.0, 5.0, 3.0, 2.3}); nearest != nil {
-		fmt.Println("Nearest neighbor:", *nearest)
+type HeapVectors []HeapVector
+
+func (h HeapVectors) Len() int           { return len(h) }
+func (h HeapVectors) Less(i, j int) bool { return h[i].distance < h[j].distance }
+func (h HeapVectors) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+
+func pushHeap(neighbors []HeapVector, point Vector, dist float32, k int) []HeapVector {
+	heap := make(HeapVectors, len(neighbors), k)
+	copy(heap, neighbors)
+	heap = heap[:min(len(heap)+1, k)]
+	heap[len(heap)-1] = HeapVector{Point: point, distance: dist}
+	sort.Sort(heap) // Using sort.Sort instead of heap.Sort()
+	return heap
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func main() {
+	points := []Vector{{1.0, 2.0, 3.0, 5.0}, {4.0, 5.0, 6.0, 2.0}, {2.0, 3.0, 4.0, 1.5}, {1.0, 5.0, 3.0, 2.3}}
+	kdTree := KDTree{Root: build(points, 0)}
+	neighbors := kdTree.nearestNeighbor(Vector{2, 3, 4, 1}, 4)
+	for _, neighbor := range neighbors {
+		fmt.Printf("Point: %v, Distance: %.2f\n", neighbor.Point, neighbor.distance)
 	}
 }
