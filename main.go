@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/sahildotexe/swah-db/swah"
-	"github.com/sahildotexe/swah-db/utils"
 	"fmt"
 	"strings"
+
+	"github.com/sahildotexe/swah-db/swah"
+	"github.com/sahildotexe/swah-db/utils"
 )
 
 func main() {
-	store := swah.NewVectorStore()
+	store := swah.Connect()
 
 	data := []string{
 		"Cricket is a popular sport in India",
@@ -43,5 +44,4 @@ func main() {
 	for _, v := range neighbours {
 		fmt.Printf("Text: %s, Simlarity= %f\n", v.Point.Text, v.Distance)
 	}
-
 }

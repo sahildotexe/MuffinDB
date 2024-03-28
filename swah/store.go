@@ -1,9 +1,11 @@
 package swah
 
 import (
-	"github.com/sahildotexe/swah-db/kdtree"
+	"fmt"
+	"os"
 
 	"github.com/google/uuid"
+	"github.com/sahildotexe/swah-db/kdtree"
 )
 
 type VectorStore struct {
@@ -13,6 +15,29 @@ type VectorStore struct {
 type Embedding struct {
 	Text  string
 	Point []float32
+}
+
+func Connect() *VectorStore {
+
+	// Connect to the VectorStore
+	// @param nil
+	// @return *VectorStore
+
+	var store *VectorStore
+	if _, err := os.Stat("data.gob"); err == nil {
+		deserializedKdtree, err := Deserialize("data.gob")
+		if err != nil {
+			panic(err)
+		}
+		store = deserializedKdtree
+		fmt.Println("Loaded existing KD-tree from file")
+	} else if os.IsNotExist(err) {
+		fmt.Println("No existing KD-tree file found, creating new KD-tree")
+		store = NewVectorStore()
+	} else {
+		panic(err)
+	}
+	return store
 }
 
 func NewVectorStore() *VectorStore {
@@ -41,6 +66,9 @@ func (vs *VectorStore) InsertVector(text string, point []float32) {
 	}
 
 	vs.Tree.Insert(v)
+	if err := Serialize(vs, "data.gob"); err != nil {
+		panic(err)
+	}
 }
 
 func (vs *VectorStore) GetAllVectors() []kdtree.Vector {
@@ -99,6 +127,9 @@ func (vs *VectorStore) DeleteVector(id string) {
 	// @return void
 
 	vs.Tree.DeleteNodeByVectorID(id)
+	if err := Serialize(vs, "data.gob"); err != nil {
+		panic(err)
+	}
 }
 
 func (vs *VectorStore) UpdateVector(id string, point []float32) {
@@ -115,4 +146,7 @@ func (vs *VectorStore) UpdateVector(id string, point []float32) {
 	vs.Tree.DeleteNodeByVectorID(id)
 
 	vs.Tree.Insert(v)
+	if err := Serialize(vs, "data.gob"); err != nil {
+		panic(err)
+	}
 }
