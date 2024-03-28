@@ -209,6 +209,48 @@ func sortByDimension(points []Vector, dim int) {
 	})
 }
 
+func (kdtree *KDTree) CountNodes() int {
+	return countNodes(kdtree.Root)
+}
+
+func countNodes(node KDTreeNode) int {
+	if node == nil {
+		return 0
+	}
+
+	switch n := node.(type) {
+	case Leaf:
+		return 1
+	case Internal:
+		leftCount := countNodes(n.Left)
+		rightCount := countNodes(n.Right)
+		return leftCount + rightCount + 1
+	default:
+		panic("unexpected node type while counting nodes")
+	}
+}
+
+func (kdtree *KDTree) CountVectors() int {
+	return countVectors(kdtree.Root)
+}
+
+func countVectors(node KDTreeNode) int {
+	if node == nil {
+		return 0
+	}
+
+	switch n := node.(type) {
+	case Leaf:
+		return 1
+	case Internal:
+		leftCount := countVectors(n.Left)
+		rightCount := countVectors(n.Right)
+		return leftCount + rightCount
+	default:
+		panic("unexpected node type while counting vectors")
+	}
+}
+
 func (kdtree KDTree) GetNeighbours(query Vector, k int) []HeapVector {
 	if k <= 0 {
 		return nil
