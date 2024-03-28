@@ -3,9 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
-
 	"github.com/sahildotexe/swah-db/swah"
-	"github.com/sahildotexe/swah-db/utils"
 )
 
 func main() {
@@ -21,12 +19,12 @@ func main() {
 	}
 
 	// Create Vocabulary and Word Index
-	vocabulary, wordIndex := utils.CreateVocabulary(data)
+	vocabulary, wordIndex := CreateVocabulary(data)
 
-	// Vectorization 
+	// Vectorization
 	vectors := make(map[string][]float32)
 	for _, sentence := range data {
-		vector := utils.VectorizeText(sentence, vocabulary, wordIndex)
+		vector := VectorizeText(sentence, vocabulary, wordIndex)
 		vectors[sentence] = vector
 	}
 
@@ -37,7 +35,7 @@ func main() {
 
 	// Get top 3 similar sentences
 	query := "Which team does Virat Kohli play for in IPL?"
-	queryVector := utils.VectorizeText(strings.ToLower(query), vocabulary, wordIndex)
+	queryVector := VectorizeText(strings.ToLower(query), vocabulary, wordIndex)
 	fmt.Println("Query Prompt: ", query)
 	k := 3
 	neighbours := store.GetKNearestNeighbors(queryVector, k)
