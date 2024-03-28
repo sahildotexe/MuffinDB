@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"os"
 
-	"github.com/sahildotexe/swah-db/kdtree"
+	"github.com/sahildotexe/SwahDB/kdtree"
 )
 
 func Serialize(store *VectorStore, filename string) error {

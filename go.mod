@@ -1,4 +1,4 @@
-module github.com/sahildotexe/swah-db
+module github.com/sahildotexe/SwahDB
 
 go 1.20
 

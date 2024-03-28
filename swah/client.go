@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/sahildotexe/swah-db/kdtree"
+	"github.com/sahildotexe/SwahDB/kdtree"
 )
 
 type VectorStore struct {

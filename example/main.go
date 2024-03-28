@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
-	"github.com/sahildotexe/swah-db/swah"
+	"github.com/sahildotexe/SwahDB/swah"
 )
 
 func main() {
