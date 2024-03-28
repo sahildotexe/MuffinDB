@@ -45,3 +45,28 @@ func (vs *VectorStore) GetAllVectors() []kdtree.Vector {
 
 	return vs.Tree.GetAllVectors()
 }
+
+func (vs *VectorStore) GetKNearestNeighbors(point []float32, k int) []kdtree.HeapVector {
+
+	// Get the nearest neighbor to a point
+	// @param point []float32, k int
+	// @return []kdtree.HeapVector
+
+	total := vs.Tree.CountVectors()
+
+	if k > total {
+		k = total
+	}
+
+	target := kdtree.Vector{
+		Values: point,
+	}
+
+	neighbours := vs.Tree.GetNeighbours(target)
+
+	if len(neighbours) < k {
+		return neighbours
+	}
+
+	return neighbours[:k]
+}
