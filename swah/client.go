@@ -1,11 +1,11 @@
-package swah
+package arka
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/sahildotexe/SwahDB/kdtree"
+	"github.com/sahildotexe/ArkaDB/kdtree"
 )
 
 type VectorStore struct {

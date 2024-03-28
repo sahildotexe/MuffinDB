@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"strings"
-	"github.com/sahildotexe/SwahDB/swah"
+
+	"github.com/sahildotexe/ArkaDB/arka"
 )
 
 func main() {
 	// Connect to the Vector Store
-	store := swah.Connect()
+	store := arka.Connect()
 
 	// Sample Data to Insert
 	data := []string{

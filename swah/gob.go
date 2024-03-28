@@ -1,10 +1,10 @@
-package swah
+package arka
 
 import (
 	"encoding/gob"
 	"os"
 
-	"github.com/sahildotexe/SwahDB/kdtree"
+	"github.com/sahildotexe/ArkaDB/kdtree"
 )
 
 func Serialize(store *VectorStore, filename string) error {

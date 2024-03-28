@@ -1,4 +1,4 @@
-module github.com/sahildotexe/SwahDB
+module github.com/sahildotexe/ArkaDB
 
 go 1.20
 
