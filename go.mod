@@ -1,4 +1,4 @@
-module GoVectorDB
+module github.com/sahildotexe/swah-db
 
 go 1.20
 

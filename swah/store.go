@@ -1,7 +1,7 @@
-package store
+package swah
 
 import (
-	"GoVectorDB/kdtree"
+	"github.com/sahildotexe/swah-db/kdtree"
 
 	"github.com/google/uuid"
 )

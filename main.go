@@ -1,14 +1,14 @@
 package main
 
 import (
-	"GoVectorDB/store"
-	"GoVectorDB/utils"
+	"github.com/sahildotexe/swah-db/swah"
+	"github.com/sahildotexe/swah-db/utils"
 	"fmt"
 	"strings"
 )
 
 func main() {
-	store := store.NewVectorStore()
+	store := swah.NewVectorStore()
 
 	data := []string{
 		"Cricket is a popular sport in India",
