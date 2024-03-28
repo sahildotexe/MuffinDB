@@ -9,8 +9,10 @@ import (
 )
 
 func main() {
+	// Connect to the Vector Store
 	store := swah.Connect()
 
+	// Sample Data to Insert
 	data := []string{
 		"Cricket is a popular sport in India",
 		"Virat Kohli represents India in international cricket",
@@ -21,7 +23,7 @@ func main() {
 	// Create Vocabulary and Word Index
 	vocabulary, wordIndex := utils.CreateVocabulary(data)
 
-	// Vectorization
+	// Vectorization 
 	vectors := make(map[string][]float32)
 	for _, sentence := range data {
 		vector := utils.VectorizeText(sentence, vocabulary, wordIndex)
@@ -33,11 +35,10 @@ func main() {
 		store.InsertVector(sentence, vector)
 	}
 
-	// Searching for Similarity
+	// Get top 3 similar sentences
 	query := "Which team does Virat Kohli play for in IPL?"
 	queryVector := utils.VectorizeText(strings.ToLower(query), vocabulary, wordIndex)
 	fmt.Println("Query Prompt: ", query)
-	// Get top 3 similar sentences
 	k := 3
 	neighbours := store.GetKNearestNeighbors(queryVector, k)
 	fmt.Printf("\nTop %d Similar Sentences:\n", k)
