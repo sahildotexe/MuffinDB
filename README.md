@@ -19,7 +19,7 @@ To get started with ArkaDB, follow these steps:
 2. Clone the ArkaDB repository:
 
 ```bash
-git clone https://github.com/your-username/ArkaDB.git
+git clone https://github.com/sahildotexe/ArkaDB.git
 ```
 
 3. Navigate to the project directory:
@@ -32,7 +32,7 @@ cd ArkaDB
 ## Usage
 
 ```go
-import "github.com/your-username/ArkaDB/arka"
+import "github.com/sahildotexe/ArkaDB/arka"
 
 func main() {
     // Connect to the vector store
