@@ -87,11 +87,94 @@ func insert(node KDTreeNode, point Vector, depth int) KDTreeNode {
 	}
 }
 
+func (kdtree *KDTree) GetNodeByVectorID(vectorID int) (Vector, bool) {
+	node := getNodeByVectorID(kdtree.Root, vectorID)
+	if node == nil {
+		return Vector{}, false
+	}
+	return node.Point, true
+}
+
+func getNodeByVectorID(node KDTreeNode, vectorID int) *Leaf {
+	switch n := node.(type) {
+	case Leaf:
+		if n.Point.ID == vectorID {
+			return &n
+		}
+		return nil
+	case Internal:
+		left := getNodeByVectorID(n.Left, vectorID)
+		if left != nil {
+			return left
+		}
+		right := getNodeByVectorID(n.Right, vectorID)
+		if right != nil {
+			return right
+		}
+		return nil
+	default:
+		panic("unexpected node type")
+	}
+}
+
+func (kdtree *KDTree) DeleteNodeByVectorID(vectorID int) {
+	kdtree.Root, _ = deleteNodeByVectorID(kdtree.Root, vectorID)
+}
+
+func deleteNodeByVectorID(node KDTreeNode, vectorID int) (KDTreeNode, bool) {
+	switch n := node.(type) {
+	case Leaf:
+		if n.Point.ID == vectorID {
+			return nil, true
+		}
+		return node, false
+	case Internal:
+		var didDelete bool
+		n.Left, didDelete = deleteNodeByVectorID(n.Left, vectorID)
+		if didDelete {
+			return n, true
+		}
+		n.Right, didDelete = deleteNodeByVectorID(n.Right, vectorID)
+		if didDelete {
+			return n, true
+		}
+		return node, false
+	default:
+		panic("unexpected node type when deleting node by vector ID")
+	}
+}
+
+func (kdtree *KDTree) GetAllVectors() []Vector {
+	vectors := make([]Vector, 0)
+	getAllVectors(kdtree.Root, &vectors)
+	return vectors
+}
+
+func getAllVectors(node KDTreeNode, vectors *[]Vector) {
+	if node == nil {
+		return
+	}
+
+	switch n := node.(type) {
+	case Leaf:
+		*vectors = append(*vectors, n.Point)
+	case Internal:
+		getAllVectors(n.Left, vectors)
+		getAllVectors(n.Right, vectors)
+	default:
+		panic("unexpected node type")
+	}
+}
+
 func (kdtree KDTree) PrintTree() {
 	printTree(kdtree.Root, 0)
 }
 
 func printTree(node KDTreeNode, depth int) {
+	if node == nil {
+		return
+	}
+
 	switch n := node.(type) {
 	case Leaf:
 		printSpaces(depth)
@@ -102,7 +185,7 @@ func printTree(node KDTreeNode, depth int) {
 		printTree(n.Left, depth+1)
 		printTree(n.Right, depth+1)
 	default:
-		panic("unexpected node type")
+		panic("unexpected node type while printing tree")
 	}
 }
 
@@ -135,6 +218,10 @@ func (kdtree KDTree) GetNeighbours(query Vector, k int) []HeapVector {
 }
 
 func (kdtree KDTree) nearest(query Vector, node KDTreeNode, neighbors []HeapVector, bestDist float32, k int) ([]HeapVector, float32) {
+	if node == nil {
+		return neighbors, bestDist
+	}
+
 	switch n := node.(type) {
 	case Leaf:
 		dist := euclideanDistance(query, n.Point)
@@ -159,7 +246,7 @@ func (kdtree KDTree) nearest(query Vector, node KDTreeNode, neighbors []HeapVect
 		}
 		return neighbors, bestDist
 	default:
-		panic("unexpected node type")
+		panic("unexpected node type while finding nearest neighbors")
 	}
 }
 
