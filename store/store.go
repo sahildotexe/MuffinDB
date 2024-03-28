@@ -10,6 +10,11 @@ type VectorStore struct {
 	Tree *kdtree.KDTree
 }
 
+type Embedding struct {
+	Text  string
+	Point []float32
+}
+
 func NewVectorStore() *VectorStore {
 
 	// Create a new VectorStore
@@ -21,7 +26,7 @@ func NewVectorStore() *VectorStore {
 	}
 }
 
-func (vs *VectorStore) InsertVector(point []float32) {
+func (vs *VectorStore) InsertVector(text string, point []float32) {
 
 	// Insert a vector into the store
 	// @param point []float32
@@ -32,6 +37,7 @@ func (vs *VectorStore) InsertVector(point []float32) {
 	v := kdtree.Vector{
 		ID:     id,
 		Values: point,
+		Text:   text,
 	}
 
 	vs.Tree.Insert(v)

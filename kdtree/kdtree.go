@@ -9,6 +9,7 @@ import (
 type Vector struct {
 	ID     string
 	Values []float32
+	Text   string
 }
 
 type KDTreeNode interface {
