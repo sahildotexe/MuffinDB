@@ -51,6 +51,41 @@ func BuildTree(points []Vector, depth int) KDTreeNode {
 	}
 }
 
+func NewKDTree() *KDTree {
+	return &KDTree{
+		Root: nil,
+	}
+}
+
+func (kdtree *KDTree) Insert(point Vector) {
+	kdtree.Root = insert(kdtree.Root, point, 0)
+}
+
+func insert(node KDTreeNode, point Vector, depth int) KDTreeNode {
+	if node == nil {
+		return Leaf{point}
+	}
+
+	switch n := node.(type) {
+	case Leaf:
+		return Internal{
+			Left:           n,
+			Right:          Leaf{point},
+			SplitValue:     point.Values[depth%len(point.Values)],
+			SplitDimension: depth % len(point.Values),
+		}
+	case Internal:
+		dim := depth % len(point.Values)
+		if point.Values[dim] < n.SplitValue {
+			n.Left = insert(n.Left, point, depth+1)
+		} else {
+			n.Right = insert(n.Right, point, depth+1)
+		}
+		return n
+	default:
+		panic("unexpected node type")
+	}
+}
 
 func (kdtree KDTree) PrintTree() {
 	printTree(kdtree.Root, 0)
