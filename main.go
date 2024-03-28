@@ -9,52 +9,52 @@ import (
 func main() {
 	store := store.NewVectorStore()
 
-	sentences := []string{
-		"I eat mango",
-		"mango is my favorite fruit",
-		"mango, apple, oranges are fruits",
-		"fruits are good for health",
+	data := []string{
+		"Cricket is a popular sport in India",
+		"Virat Kohli represents India in international cricket",
+		"Virat Kohli plays for RCB in IPL",
+		"Virat Kohli is my favorite cricketer",
 	}
 
 	// Tokenization and Vocabulary Creation
 	vocabulary := make(map[string]int)
-	for _, sentence := range sentences {
+	wordIndex := make(map[string]int)
+	index := 0
+	for _, sentence := range data {
 		tokens := strings.Fields(strings.ToLower(sentence))
 		for _, token := range tokens {
-			vocabulary[token]++
+			if _, exists := vocabulary[token]; !exists {
+				vocabulary[token] = index
+				wordIndex[token] = index
+				index++
+			}
 		}
 	}
 
-	// Assign unique indices to words in the vocabulary
-	wordToIndex := make(map[string]int)
-	index := 0
-	for word := range vocabulary {
-		wordToIndex[word] = index
-		index++
-	}
-
 	// Vectorization
-	var sentenceVectors map[string][]float32 = make(map[string][]float32)
-	for _, sentence := range sentences {
+	sentenceVectors := make(map[string][]float32)
+	for _, sentence := range data {
 		tokens := strings.Fields(strings.ToLower(sentence))
 		vector := make([]float32, len(vocabulary))
 		for _, token := range tokens {
-			vector[wordToIndex[token]]++
+			vector[wordIndex[token]]++
 		}
 		sentenceVectors[sentence] = vector
 	}
 
+	// Inserting Vectors into the Store
 	for sentence, vector := range sentenceVectors {
 		store.InsertVector(sentence, vector)
 	}
 
 	// Searching for Similarity
-	querySentence := "Mango is the best fruit"
+	query := "Which team does Virat Kohli play for in IPL?"
+
+	queryTokens := strings.Fields(strings.ToLower(query))
 	queryVector := make([]float32, len(vocabulary))
-	queryTokens := strings.Fields(strings.ToLower(querySentence))
 	for _, token := range queryTokens {
-		if index, ok := wordToIndex[token]; ok {
-			queryVector[index]++
+		if idx, exists := wordIndex[token]; exists {
+			queryVector[idx]++
 		}
 	}
 
