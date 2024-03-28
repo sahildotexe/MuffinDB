@@ -30,9 +30,9 @@ func Connect() *VectorStore {
 			panic(err)
 		}
 		store = deserializedKdtree
-		fmt.Println("Loaded existing KD-tree from file")
+		fmt.Println("Loaded existing data from file")
 	} else if os.IsNotExist(err) {
-		fmt.Println("No existing KD-tree file found, creating new KD-tree")
+		fmt.Println("No existing data found, creating new Vector Store")
 		store = NewVectorStore()
 	} else {
 		panic(err)

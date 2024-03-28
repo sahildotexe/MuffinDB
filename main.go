@@ -40,7 +40,7 @@ func main() {
 	// Get top 3 similar sentences
 	k := 3
 	neighbours := store.GetKNearestNeighbors(queryVector, k)
-	fmt.Println("\nTop 3 Similar Sentences: ")
+	fmt.Printf("\nTop %d Similar Sentences:\n", k)
 	for _, v := range neighbours {
 		fmt.Printf("Text: %s, Simlarity= %f\n", v.Point.Text, v.Distance)
 	}
