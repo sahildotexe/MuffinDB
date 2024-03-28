@@ -7,7 +7,7 @@ import (
 )
 
 type Vector struct {
-	ID     int
+	ID     string
 	Values []float32
 }
 
@@ -87,7 +87,7 @@ func insert(node KDTreeNode, point Vector, depth int) KDTreeNode {
 	}
 }
 
-func (kdtree *KDTree) GetNodeByVectorID(vectorID int) (Vector, bool) {
+func (kdtree *KDTree) GetNodeByVectorID(vectorID string) (Vector, bool) {
 	node := getNodeByVectorID(kdtree.Root, vectorID)
 	if node == nil {
 		return Vector{}, false
@@ -95,7 +95,7 @@ func (kdtree *KDTree) GetNodeByVectorID(vectorID int) (Vector, bool) {
 	return node.Point, true
 }
 
-func getNodeByVectorID(node KDTreeNode, vectorID int) *Leaf {
+func getNodeByVectorID(node KDTreeNode, vectorID string) *Leaf {
 	switch n := node.(type) {
 	case Leaf:
 		if n.Point.ID == vectorID {
@@ -117,11 +117,11 @@ func getNodeByVectorID(node KDTreeNode, vectorID int) *Leaf {
 	}
 }
 
-func (kdtree *KDTree) DeleteNodeByVectorID(vectorID int) {
+func (kdtree *KDTree) DeleteNodeByVectorID(vectorID string) {
 	kdtree.Root, _ = deleteNodeByVectorID(kdtree.Root, vectorID)
 }
 
-func deleteNodeByVectorID(node KDTreeNode, vectorID int) (KDTreeNode, bool) {
+func deleteNodeByVectorID(node KDTreeNode, vectorID string) (KDTreeNode, bool) {
 	switch n := node.(type) {
 	case Leaf:
 		if n.Point.ID == vectorID {
@@ -200,7 +200,7 @@ func printInternal(node Internal) {
 }
 
 func printVector(v Vector) {
-	fmt.Printf("ID: %d, Point: %v\n", v.ID, v.Values)
+	fmt.Printf("ID: %s, Point: %v\n", v.ID, v.Values)
 }
 
 func sortByDimension(points []Vector, dim int) {
@@ -256,7 +256,6 @@ func (kdtree KDTree) GetNeighbours(query Vector) []HeapVector {
 	if k <= 0 {
 		return nil
 	}
-	fmt.Println("k: ", k)
 	neighbors, _ := kdtree.nearest(query, kdtree.Root, make([]HeapVector, 0, k), math.MaxFloat32, k)
 	return neighbors
 }
