@@ -70,3 +70,43 @@ func (vs *VectorStore) GetKNearestNeighbors(point []float32, k int) []kdtree.Hea
 
 	return neighbours[:k]
 }
+
+func (vs *VectorStore) GetVector(id string) kdtree.Vector {
+
+	// Get a vector from the store
+	// @param id string
+	// @return kdtree.Vector
+
+	vec, found := vs.Tree.GetNodeByVectorID(id)
+
+	if !found {
+		return kdtree.Vector{}
+	}
+
+	return vec
+}
+
+func (vs *VectorStore) DeleteVector(id string) {
+
+	// Delete a vector from the store
+	// @param id string
+	// @return void
+
+	vs.Tree.DeleteNodeByVectorID(id)
+}
+
+func (vs *VectorStore) UpdateVector(id string, point []float32) {
+
+	// Update a vector in the store
+	// @param id string, point []float32
+	// @return void
+
+	v := kdtree.Vector{
+		ID:     id,
+		Values: point,
+	}
+
+	vs.Tree.DeleteNodeByVectorID(id)
+
+	vs.Tree.Insert(v)
+}

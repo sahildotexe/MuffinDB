@@ -11,10 +11,12 @@ func main() {
 	store.InsertVector([]float32{4, 5, 6})
 	store.InsertVector([]float32{7, 8, 9})
 	store.InsertVector([]float32{10, 11, 12})
-	// vecs := store.GetAllVectors()
-	// for _, v := range vecs {
-	// 	fmt.Println(v)
-	// }
+
+	vecs := store.GetAllVectors()
+	for _, v := range vecs {
+		fmt.Println(v)
+	}
+
 	tar := []float32{1, 2, 3}
 	neighbours := store.GetKNearestNeighbors(tar, 5)
 
