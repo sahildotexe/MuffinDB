@@ -251,10 +251,12 @@ func countVectors(node KDTreeNode) int {
 	}
 }
 
-func (kdtree KDTree) GetNeighbours(query Vector, k int) []HeapVector {
+func (kdtree KDTree) GetNeighbours(query Vector) []HeapVector {
+	k := kdtree.CountVectors()
 	if k <= 0 {
 		return nil
 	}
+	fmt.Println("k: ", k)
 	neighbors, _ := kdtree.nearest(query, kdtree.Root, make([]HeapVector, 0, k), math.MaxFloat32, k)
 	return neighbors
 }
