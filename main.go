@@ -2,6 +2,7 @@ package main
 
 import (
 	"GoVectorDB/store"
+	"GoVectorDB/utils"
 	"fmt"
 	"strings"
 )
@@ -16,58 +17,31 @@ func main() {
 		"Virat Kohli is my favorite cricketer",
 	}
 
-	// Tokenization and Vocabulary Creation
-	vocabulary := make(map[string]int)
-	wordIndex := make(map[string]int)
-	index := 0
-	for _, sentence := range data {
-		tokens := strings.Fields(strings.ToLower(sentence))
-		for _, token := range tokens {
-			if _, exists := vocabulary[token]; !exists {
-				vocabulary[token] = index
-				wordIndex[token] = index
-				index++
-			}
-		}
-	}
+	// Create Vocabulary and Word Index
+	vocabulary, wordIndex := utils.CreateVocabulary(data)
 
 	// Vectorization
-	sentenceVectors := make(map[string][]float32)
+	vectors := make(map[string][]float32)
 	for _, sentence := range data {
-		tokens := strings.Fields(strings.ToLower(sentence))
-		vector := make([]float32, len(vocabulary))
-		for _, token := range tokens {
-			vector[wordIndex[token]]++
-		}
-		sentenceVectors[sentence] = vector
+		vector := utils.VectorizeText(sentence, vocabulary, wordIndex)
+		vectors[sentence] = vector
 	}
 
 	// Inserting Vectors into the Store
-	for sentence, vector := range sentenceVectors {
+	for sentence, vector := range vectors {
 		store.InsertVector(sentence, vector)
 	}
 
 	// Searching for Similarity
 	query := "Which team does Virat Kohli play for in IPL?"
-
-	queryTokens := strings.Fields(strings.ToLower(query))
-	queryVector := make([]float32, len(vocabulary))
-	for _, token := range queryTokens {
-		if idx, exists := wordIndex[token]; exists {
-			queryVector[idx]++
-		}
-	}
-
-	fmt.Println("Query Vector:", queryVector)
-
-	vecs := store.GetAllVectors()
-	for _, v := range vecs {
-		fmt.Println(v)
-	}
-	fmt.Println("-------------------")
-	neighbours := store.GetKNearestNeighbors(queryVector, 4)
-
+	queryVector := utils.VectorizeText(strings.ToLower(query), vocabulary, wordIndex)
+	fmt.Println("Query Prompt: ", query)
+	// Get top 3 similar sentences
+	k := 3
+	neighbours := store.GetKNearestNeighbors(queryVector, k)
+	fmt.Println("\nTop 3 Similar Sentences: ")
 	for _, v := range neighbours {
-		fmt.Printf("Text: %s, Distance: %f\n", v.Point.Text, v.Distance)
+		fmt.Printf("Text: %s, Simlarity= %f\n", v.Point.Text, v.Distance)
 	}
+
 }
