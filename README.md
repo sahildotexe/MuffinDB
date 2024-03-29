@@ -80,6 +80,7 @@ go get github.com/sahildotexe/MuffinDB
 ```
 
 ## Usage
+You can find the entire code at [Example](https://github.com/sahildotexe/MuffinDB/tree/main/example) . In this example, I've used Count Vectorization approach for vectorization but you can use any approach as per your choice.
 
 ```go
 package main
