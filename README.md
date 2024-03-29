@@ -1,6 +1,6 @@
 # MuffinDB
 
-MuffinDB is a simple and efficient vector store database written in Go. It uses a KD-Tree data structure to store and retrieve vectors efficiently. The database supports basic operations like inserting, deleting, updating, and querying vectors based on their proximity to a given query vector.
+MuffinDB is a simple and efficient vector store database written in Go. It uses a KD-Tree data structure to store and retrieve vectors efficiently, supporting basic operations like inserting, deleting, updating, and querying vectors based on proximity. With its optimized KD-Tree implementation, MuffinDB enables fast and accurate nearest neighbor searches, making it an ideal choice for efficiently storing and retrieving vectors in AI applications that require similarity-based queries or nearest neighbor lookups.
 
 ## Use Cases
 
