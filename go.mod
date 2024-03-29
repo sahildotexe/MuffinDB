@@ -1,4 +1,4 @@
-module github.com/sahildotexe/ArkaDB
+module github.com/sahildotexe/MuffinDB
 
 go 1.20
 

@@ -1,11 +1,11 @@
-package arka
+package muffin
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/sahildotexe/ArkaDB/kdtree"
+	"github.com/sahildotexe/MuffinDB/kdtree"
 )
 
 type VectorStore struct {

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sahildotexe/ArkaDB/arka"
+	"github.com/sahildotexe/MuffinDB/muffin"
 )
 
 func main() {
 	// Connect to the Vector Store
-	store := arka.Connect()
+	store := muffin.Connect()
 
 	// Sample Data to Insert
 	data := []string{

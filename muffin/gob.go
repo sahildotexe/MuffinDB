@@ -1,10 +1,10 @@
-package arka
+package muffin
 
 import (
 	"encoding/gob"
 	"os"
 
-	"github.com/sahildotexe/ArkaDB/kdtree"
+	"github.com/sahildotexe/MuffinDB/kdtree"
 )
 
 func Serialize(store *VectorStore, filename string) error {
