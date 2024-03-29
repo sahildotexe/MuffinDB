@@ -48,9 +48,6 @@ These are just a few examples, and the applications of vector databases can exte
 
 - **Fast Vector Insertion**: MuffinDB allows you to insert vectors quickly using the `InsertVector` method.
 - **Efficient Nearest Neighbor Search**: The KD-Tree data structure enables fast nearest neighbor searches, allowing you to retrieve the `k` nearest vectors to a given query vector using the `GetKNearestNeighbors` method.
-- **Vector Retrieval**: You can retrieve a specific vector by its ID using the `GetVector` method.
-- **Vector Deletion**: MuffinDB supports deleting vectors from the database using the `DeleteVector` method.
-- **Vector Updating**: You can update an existing vector in the database using the `UpdateVector` method.
 - **Persistence**: MuffinDB stores the vector data on disk using Go's built-in `encoding/gob` package, ensuring data persistence across program restarts.
 
 ## Getting Started
