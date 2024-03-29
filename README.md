@@ -16,37 +16,77 @@ MuffinDB is a simple and efficient vector store database written in Go. It uses 
 To get started with MuffinDB, follow these steps:
 
 1. Install Go on your machine if you haven't already.
-2. Clone the MuffinDB repository:
 
+2. Create a directory for your project
 ```bash
-git clone https://github.com/sahildotexe/MuffinDB.git
+mkdir my-project
 ```
 
 3. Navigate to the project directory:
 ```bash
-cd MuffinDB
+cd my-project
 ```
 
-4. Import the muffin package in your Go code and start using MuffinDB!
+4. Initialize a new Go module
+```bash
+go mod init example.com/my-project
+```
+This will create a go.mod file in your project directory.
+
+5. Import MuffinDB package
+```bash
+go get github.com/sahildotexe/MuffinDB
+```
 
 ## Usage
 
 ```go
-import "github.com/sahildotexe/MuffinDB/muffin"
+package main
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/sahildotexe/MuffinDB/muffin"
+)
 
 func main() {
-    // Connect to the vector store
-    store := muffin.Connect()
+	// Connect to the Vector Store
+	store := muffin.Connect()
 
-    // Insert a vector
-    store.InsertVector("This is a sample text", []float32{0.1, 0.2, 0.3})
+	// Sample Data to Insert
+	data := []string{
+		"Cricket is a popular sport in India",
+		"Virat Kohli represents India in international cricket",
+		"Virat Kohli plays for RCB in IPL",
+		"Virat Kohli is my favorite cricketer",
+	}
 
-    // Get the nearest neighbor to a query vector
-    queryVector := []float32{0.15, 0.25, 0.35}
-    neighbors := store.GetKNearestNeighbors(queryVector, 1)
+	// Create Vocabulary and Word Index
+	vocabulary, wordIndex := CreateVocabulary(data)
 
-    // Print the nearest neighbor's text
-    fmt.Println(neighbors[0].Point.Text)
+	// Vectorization
+	vectors := make(map[string][]float32)
+	for _, sentence := range data {
+		vector := VectorizeText(sentence, vocabulary, wordIndex)
+		vectors[sentence] = vector
+	}
+
+	// Inserting Vectors into the Store
+	for sentence, vector := range vectors {
+		store.InsertVector(sentence, vector)
+	}
+
+	// Get top 3 similar sentences
+	query := "Which team does Virat Kohli play for in IPL?"
+	queryVector := VectorizeText(strings.ToLower(query), vocabulary, wordIndex)
+	fmt.Println("Query Prompt: ", query)
+	k := 3
+	neighbours := store.GetKNearestNeighbors(queryVector, k)
+	fmt.Printf("\nTop %d Similar Sentences:\n", k)
+	for _, v := range neighbours {
+		fmt.Printf("Text: %s, Simlarity= %f\n", v.Point.Text, v.Distance)
+	}
 }
 ```
 
