@@ -2,6 +2,47 @@
 
 MuffinDB is a simple and efficient vector store database written in Go. It uses a KD-Tree data structure to store and retrieve vectors efficiently. The database supports basic operations like inserting, deleting, updating, and querying vectors based on their proximity to a given query vector.
 
+## Use Cases
+
+MuffinDB, a vector store database, can be used in various applications and scenarios where efficient storage and retrieval of high-dimensional data is required. Some potential use cases include:
+
+- **Similarity Search**
+  - Content-based recommendation systems (e.g., movies, music, products)
+  - Image and video similarity search
+  - Document and text similarity search
+  - Nearest neighbor search in high-dimensional spaces
+
+- **Natural Language Processing (NLP)**
+  - Storing and searching word embeddings
+  - Semantic similarity between documents or sentences
+  - Language modeling and text generation
+
+- **Computer Vision**
+  - Face recognition and facial feature matching
+  - Image and object recognition and retrieval
+  - Clustering and categorization of images
+
+- **Bioinformatics**
+  - Storing and analyzing gene sequences
+  - Protein structure similarity search
+  - Clustering and classification of biological data
+
+- **Recommender Systems**
+  - Building personalized recommendation engines
+  - Collaborative filtering based on user/item embeddings
+  - Content-based filtering using vector representations
+
+- **Anomaly Detection**
+  - Detecting anomalies or outliers in high-dimensional data
+  - Fraud detection in financial transactions
+  - Network intrusion detection
+
+- **Data Clustering and Dimensionality Reduction**
+  - Efficiently clustering high-dimensional data points
+  - Visualizing and exploring high-dimensional data
+
+These are just a few examples, and the applications of vector databases can extend to various domains where efficient storage, retrieval, and similarity search of high-dimensional data are required.
+
 ## Features
 
 - **Fast Vector Insertion**: MuffinDB allows you to insert vectors quickly using the `InsertVector` method.
