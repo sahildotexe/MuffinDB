@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/sahildotexe/MuffinDB/muffin"
@@ -35,7 +37,14 @@ func main() {
 	}
 
 	// Get top 3 similar sentences
-	query := "Which team does Virat Kohli play for in IPL?"
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter your query")
+	query, err := reader.ReadString('\n')
+	if err!=nil {
+		panic("Not able to read data")
+	}
+	query = strings.TrimSpace(query)
+	
 	queryVector := VectorizeText(strings.ToLower(query), vocabulary, wordIndex)
 	fmt.Println("Query Prompt: ", query)
 	k := 3
